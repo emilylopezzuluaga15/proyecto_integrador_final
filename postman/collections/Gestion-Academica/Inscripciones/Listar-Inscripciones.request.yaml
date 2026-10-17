@@ -1,0 +1,5 @@
+$kind: http-request
+name: Listar Inscripciones
+order: 2000
+method: GET
+url: '{{baseUrl}}/api/inscripciones'

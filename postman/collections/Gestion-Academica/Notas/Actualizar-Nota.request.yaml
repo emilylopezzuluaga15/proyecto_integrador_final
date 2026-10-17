@@ -1,0 +1,18 @@
+$kind: http-request
+name: Actualizar Nota
+order: 4000
+method: PUT
+url: '{{baseUrl}}/api/notas/{{id}}'
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "definitiva": 3.8,
+      "fechaRegistro": "2024-06-15",
+      "aprobada": true,
+      "estudiante": { "idEstudiante": "EST001" },
+      "materia": { "idMateria": "MAT001" }
+    }

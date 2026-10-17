@@ -1,0 +1,5 @@
+$kind: http-request
+name: Obtener Nota
+order: 3000
+method: GET
+url: '{{baseUrl}}/api/notas/{{id}}'

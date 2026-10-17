@@ -1,0 +1,15 @@
+$kind: http-request
+name: Crear NivelMateria
+order: 1000
+method: POST
+url: '{{baseUrl}}/api/niveles-materias'
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "nivel": { "idNivel": "NIV001" },
+      "materia": { "idMateria": "MAT001" }
+    }

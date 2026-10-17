@@ -1,0 +1,5 @@
+$kind: http-request
+name: Obtener NivelMateria
+order: 3000
+method: GET
+url: '{{baseUrl}}/api/niveles-materias/{{id}}'

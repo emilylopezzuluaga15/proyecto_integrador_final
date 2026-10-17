@@ -1,0 +1,6 @@
+$kind: collection
+name: 'Gestión Académica'
+description: 'Colección completa para la API de Gestión Académica en localhost:8080'
+variables:
+  - key: baseUrl
+    value: 'http://localhost:8080'

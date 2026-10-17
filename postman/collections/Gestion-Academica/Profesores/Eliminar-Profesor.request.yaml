@@ -1,0 +1,5 @@
+$kind: http-request
+name: Eliminar Profesor
+order: 5000
+method: DELETE
+url: '{{baseUrl}}/api/profesores/{{id}}'

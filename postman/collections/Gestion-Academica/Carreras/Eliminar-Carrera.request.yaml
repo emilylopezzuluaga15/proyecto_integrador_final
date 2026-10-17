@@ -1,0 +1,5 @@
+$kind: http-request
+name: Eliminar Carrera
+order: 5000
+method: DELETE
+url: '{{baseUrl}}/api/carreras/{{id}}'

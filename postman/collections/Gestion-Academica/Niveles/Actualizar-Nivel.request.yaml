@@ -1,0 +1,16 @@
+$kind: http-request
+name: Actualizar Nivel
+order: 4000
+method: PUT
+url: '{{baseUrl}}/api/niveles/{{id}}'
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "idNivel": "NIV001",
+      "nombreNivel": "Primer Semestre Actualizado",
+      "carrera": { "idCarrera": "CAR001" }
+    }

@@ -1,0 +1,5 @@
+$kind: http-request
+name: Obtener Profesor
+order: 3000
+method: GET
+url: '{{baseUrl}}/api/profesores/{{id}}'

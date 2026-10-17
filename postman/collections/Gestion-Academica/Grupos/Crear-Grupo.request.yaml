@@ -1,0 +1,16 @@
+$kind: http-request
+name: Crear Grupo
+order: 1000
+method: POST
+url: '{{baseUrl}}/api/grupos'
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "idGrupo": "GRP001",
+      "nombreGrupo": "Grupo A",
+      "nivel": { "idNivel": "NIV001" }
+    }
