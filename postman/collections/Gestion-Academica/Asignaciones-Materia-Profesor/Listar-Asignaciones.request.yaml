@@ -3,3 +3,6 @@ name: Listar Asignaciones
 order: 2000
 method: GET
 url: '{{baseUrl}}/api/asignaciones-materia-profesor'
+headers:
+  - key: Authorization
+    value: 'Bearer {{token}}'

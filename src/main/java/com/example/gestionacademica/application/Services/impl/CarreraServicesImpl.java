@@ -7,10 +7,12 @@ import com.example.gestionacademica.domain.models.Carrera;
 import com.example.gestionacademica.domain.repository.CarreraRepository;
 import com.example.gestionacademica.domain.repository.NivelRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
+@Transactional
 public class CarreraServicesImpl implements CarreraServices {
 
     private final CarreraRepository carreraRepository;

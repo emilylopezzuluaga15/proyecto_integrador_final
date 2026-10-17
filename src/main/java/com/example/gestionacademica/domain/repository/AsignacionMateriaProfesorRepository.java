@@ -28,4 +28,10 @@ public interface AsignacionMateriaProfesorRepository {
     long countByGrupoIdGrupo(String idGrupo);
 
     long countByMateriaIdMateria(String idMateria);
+
+    boolean existsByProfesorIdProfesorAndMateriaIdMateria(String idProfesor, String idMateria);
+
+    boolean existsByProfesorIdProfesorAndGrupoIdGrupo(String idProfesor, String idGrupo);
+
+    boolean existsByProfesorIdProfesorAndGrupoIdGrupoAndMateriaIdMateria(String idProfesor, String idGrupo, String idMateria);
 }

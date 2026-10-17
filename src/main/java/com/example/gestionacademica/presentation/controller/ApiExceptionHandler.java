@@ -13,7 +13,12 @@ import com.example.gestionacademica.application.Exceptions.NivelMateriaNotFoundE
 import com.example.gestionacademica.application.Exceptions.NivelNotFoundException;
 import com.example.gestionacademica.application.Exceptions.NotaNotFoundException;
 import com.example.gestionacademica.application.Exceptions.ProfesorNotFoundException;
+import com.example.gestionacademica.application.Exceptions.CredencialesInvalidasException;
+import com.example.gestionacademica.application.Exceptions.UsuarioNotFoundException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -30,6 +35,8 @@ import java.util.Map;
 @RestControllerAdvice
 public class ApiExceptionHandler {
 
+    private static final Logger log = LoggerFactory.getLogger(ApiExceptionHandler.class);
+
     @ExceptionHandler({
             CarreraNotFoundException.class,
             NivelNotFoundException.class,
@@ -42,7 +49,8 @@ public class ApiExceptionHandler {
             InscripcionNotFoundException.class,
             AsistenciaNotFoundException.class,
             NotaNotFoundException.class,
-            MovimientoNotaNotFoundException.class
+            MovimientoNotaNotFoundException.class,
+            UsuarioNotFoundException.class
     })
     public ResponseEntity<Map<String, Object>> handleNotFound(RuntimeException ex) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(buildBody(HttpStatus.NOT_FOUND, ex.getMessage()));
@@ -82,10 +90,24 @@ public class ApiExceptionHandler {
                 .body(buildBody(HttpStatus.BAD_REQUEST, "Falta el parámetro obligatorio: " + ex.getParameterName()));
     }
 
+    @ExceptionHandler(CredencialesInvalidasException.class)
+    public ResponseEntity<Map<String, Object>> handleCredenciales(CredencialesInvalidasException ex) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(buildBody(HttpStatus.UNAUTHORIZED, ex.getMessage()));
+    }
+
+    // Lo lanza @PreAuthorize cuando el rol no alcanza
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<Map<String, Object>> handleAccessDenied(AccessDeniedException ex) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(buildBody(HttpStatus.FORBIDDEN, "Tu rol no tiene permiso para esta operación"));
+    }
+
+    // El detalle queda en el log; al cliente no se le exponen mensajes internos
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, Object>> handleGeneral(Exception ex) {
+        log.error("Error no controlado", ex);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(buildBody(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage()));
+                .body(buildBody(HttpStatus.INTERNAL_SERVER_ERROR, "Ocurrió un error interno. Intenta de nuevo o contacta al administrador."));
     }
 
     private Map<String, Object> buildBody(HttpStatus status, String message) {

@@ -4,6 +4,8 @@ order: 1000
 method: POST
 url: '{{baseUrl}}/api/grupos'
 headers:
+  - key: Authorization
+    value: 'Bearer {{token}}'
   - key: Content-Type
     value: application/json
 body:
@@ -12,5 +14,5 @@ body:
     {
       "idGrupo": "GRP001",
       "nombreGrupo": "Grupo A",
-      "nivel": { "idNivel": "NIV001" }
+      "idNivel": "NIV001"
     }

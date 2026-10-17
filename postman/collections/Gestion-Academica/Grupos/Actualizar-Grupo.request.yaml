@@ -4,6 +4,8 @@ order: 4000
 method: PUT
 url: '{{baseUrl}}/api/grupos/{{id}}'
 headers:
+  - key: Authorization
+    value: 'Bearer {{token}}'
   - key: Content-Type
     value: application/json
 body:
@@ -12,5 +14,5 @@ body:
     {
       "idGrupo": "GRP001",
       "nombreGrupo": "Grupo A Actualizado",
-      "nivel": { "idNivel": "NIV001" }
+      "idNivel": "NIV001"
     }

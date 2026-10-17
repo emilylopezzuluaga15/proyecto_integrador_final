@@ -3,3 +3,6 @@ name: Eliminar Nivel
 order: 5000
 method: DELETE
 url: '{{baseUrl}}/api/niveles/{{id}}'
+headers:
+  - key: Authorization
+    value: 'Bearer {{token}}'

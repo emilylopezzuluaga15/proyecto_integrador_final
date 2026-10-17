@@ -4,6 +4,8 @@ order: 1000
 method: POST
 url: '{{baseUrl}}/api/movimiento-notas'
 headers:
+  - key: Authorization
+    value: 'Bearer {{token}}'
   - key: Content-Type
     value: application/json
 body:
@@ -12,5 +14,5 @@ body:
     {
       "fechaRegistro": "2024-06-20",
       "calificacion": 3.8,
-      "nota": { "idNota": 1 }
+      "idNota": 1
     }

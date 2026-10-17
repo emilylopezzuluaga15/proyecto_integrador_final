@@ -7,10 +7,12 @@ import com.example.gestionacademica.domain.models.MovimientoNota;
 import com.example.gestionacademica.domain.models.Nota;
 import com.example.gestionacademica.domain.repository.MovimientoNotaRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
+@Transactional
 public class MovimientoNotaServicesImpl implements MovimientoNotaServices {
 
     private final MovimientoNotaRepository movimientoNotaRepository;

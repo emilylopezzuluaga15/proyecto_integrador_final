@@ -3,3 +3,6 @@ name: Obtener Nivel
 order: 3000
 method: GET
 url: '{{baseUrl}}/api/niveles/{{id}}'
+headers:
+  - key: Authorization
+    value: 'Bearer {{token}}'

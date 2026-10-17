@@ -3,3 +3,6 @@ name: Listar MovimientoNotas
 order: 2000
 method: GET
 url: '{{baseUrl}}/api/movimiento-notas'
+headers:
+  - key: Authorization
+    value: 'Bearer {{token}}'

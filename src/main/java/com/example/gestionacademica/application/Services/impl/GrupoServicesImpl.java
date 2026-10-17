@@ -9,10 +9,12 @@ import com.example.gestionacademica.domain.repository.AsistenciaRepository;
 import com.example.gestionacademica.domain.repository.GrupoRepository;
 import com.example.gestionacademica.domain.repository.InscripcionRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
+@Transactional
 public class GrupoServicesImpl implements GrupoServices {
 
     private final GrupoRepository grupoRepository;

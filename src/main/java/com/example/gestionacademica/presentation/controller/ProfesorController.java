@@ -1,14 +1,19 @@
 package com.example.gestionacademica.presentation.controller;
 
 import com.example.gestionacademica.application.Services.ProfesorServices;
-import com.example.gestionacademica.domain.models.Profesor;
+import com.example.gestionacademica.presentation.dto.AlCrear;
+import com.example.gestionacademica.presentation.dto.ProfesorDtos.ProfesorRequest;
+import com.example.gestionacademica.presentation.dto.ProfesorDtos.ProfesorResponse;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import jakarta.validation.Valid;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+// Consulta: personal (contiene datos de contacto). Cambios: ADMINISTRATIVO y COORDINADOR
 @RestController
 @RequestMapping("/api/profesores")
 public class ProfesorController {
@@ -20,26 +25,32 @@ public class ProfesorController {
     }
 
     @PostMapping
-    public ResponseEntity<Profesor> crear(@Valid @RequestBody Profesor profesor) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(profesorServices.crear(profesor));
+    @PreAuthorize("@acceso.esGestor(authentication)")
+    public ResponseEntity<ProfesorResponse> crear(@Validated(AlCrear.class) @RequestBody ProfesorRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ProfesorResponse.from(profesorServices.crear(request.toEntity())));
     }
 
     @GetMapping
-    public List<Profesor> listar() {
-        return profesorServices.obtenerTodos();
+    @PreAuthorize("@acceso.esPersonal(authentication)")
+    public List<ProfesorResponse> listar() {
+        return profesorServices.obtenerTodos().stream().map(ProfesorResponse::from).toList();
     }
 
     @GetMapping("/{id}")
-    public Profesor obtener(@PathVariable String id) {
-        return profesorServices.obtenerPorId(id);
+    @PreAuthorize("@acceso.esPersonal(authentication)")
+    public ProfesorResponse obtener(@PathVariable String id) {
+        return ProfesorResponse.from(profesorServices.obtenerPorId(id));
     }
 
     @PutMapping("/{id}")
-    public Profesor actualizar(@PathVariable String id, @Valid @RequestBody Profesor datos) {
-        return profesorServices.actualizar(id, datos);
+    @PreAuthorize("@acceso.esGestor(authentication)")
+    public ProfesorResponse actualizar(@PathVariable String id, @Valid @RequestBody ProfesorRequest request) {
+        return ProfesorResponse.from(profesorServices.actualizar(id, request.toEntity()));
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("@acceso.esGestor(authentication)")
     public ResponseEntity<Void> eliminar(@PathVariable String id) {
         profesorServices.eliminar(id);
         return ResponseEntity.noContent().build();

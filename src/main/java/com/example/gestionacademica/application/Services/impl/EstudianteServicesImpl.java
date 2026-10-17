@@ -9,10 +9,12 @@ import com.example.gestionacademica.domain.repository.EstudianteRepository;
 import com.example.gestionacademica.domain.repository.InscripcionRepository;
 import com.example.gestionacademica.domain.repository.NotaRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
+@Transactional
 public class EstudianteServicesImpl implements EstudianteServices {
 
     private final EstudianteRepository estudianteRepository;

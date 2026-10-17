@@ -4,12 +4,14 @@ order: 4000
 method: PUT
 url: '{{baseUrl}}/api/niveles-materias/{{id}}'
 headers:
+  - key: Authorization
+    value: 'Bearer {{token}}'
   - key: Content-Type
     value: application/json
 body:
   type: json
   content: |-
     {
-      "nivel": { "idNivel": "NIV001" },
-      "materia": { "idMateria": "MAT001" }
+      "idNivel": "NIV001",
+      "idMateria": "MAT001"
     }

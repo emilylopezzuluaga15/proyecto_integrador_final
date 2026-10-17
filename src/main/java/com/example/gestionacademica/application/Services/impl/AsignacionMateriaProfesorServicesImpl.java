@@ -13,10 +13,12 @@ import com.example.gestionacademica.domain.repository.GrupoRepository;
 import com.example.gestionacademica.domain.repository.NivelMateriaRepository;
 import com.example.gestionacademica.domain.repository.ProfesorRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
+@Transactional
 public class AsignacionMateriaProfesorServicesImpl implements AsignacionMateriaProfesorServices {
 
     private final AsignacionMateriaProfesorRepository asignacionMateriaProfesorRepository;

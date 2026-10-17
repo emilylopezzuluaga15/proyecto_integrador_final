@@ -3,3 +3,6 @@ name: Listar Carreras
 order: 2000
 method: GET
 url: '{{baseUrl}}/api/carreras'
+headers:
+  - key: Authorization
+    value: 'Bearer {{token}}'

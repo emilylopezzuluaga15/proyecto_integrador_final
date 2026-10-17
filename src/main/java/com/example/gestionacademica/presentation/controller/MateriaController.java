@@ -1,14 +1,19 @@
 package com.example.gestionacademica.presentation.controller;
 
 import com.example.gestionacademica.application.Services.MateriaServices;
-import com.example.gestionacademica.domain.models.Materia;
+import com.example.gestionacademica.presentation.dto.AlCrear;
+import com.example.gestionacademica.presentation.dto.MateriaDtos.MateriaRequest;
+import com.example.gestionacademica.presentation.dto.MateriaDtos.MateriaResponse;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import jakarta.validation.Valid;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+// Consulta: cualquier usuario autenticado. Cambios: ADMINISTRATIVO y COORDINADOR
 @RestController
 @RequestMapping("/api/materias")
 public class MateriaController {
@@ -20,26 +25,30 @@ public class MateriaController {
     }
 
     @PostMapping
-    public ResponseEntity<Materia> crear(@Valid @RequestBody Materia materia) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(materiaServices.crear(materia));
+    @PreAuthorize("@acceso.esGestor(authentication)")
+    public ResponseEntity<MateriaResponse> crear(@Validated(AlCrear.class) @RequestBody MateriaRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(MateriaResponse.from(materiaServices.crear(request.toEntity())));
     }
 
     @GetMapping
-    public List<Materia> listar() {
-        return materiaServices.obtenerTodos();
+    public List<MateriaResponse> listar() {
+        return materiaServices.obtenerTodos().stream().map(MateriaResponse::from).toList();
     }
 
     @GetMapping("/{id}")
-    public Materia obtener(@PathVariable String id) {
-        return materiaServices.obtenerPorId(id);
+    public MateriaResponse obtener(@PathVariable String id) {
+        return MateriaResponse.from(materiaServices.obtenerPorId(id));
     }
 
     @PutMapping("/{id}")
-    public Materia actualizar(@PathVariable String id, @Valid @RequestBody Materia datos) {
-        return materiaServices.actualizar(id, datos);
+    @PreAuthorize("@acceso.esGestor(authentication)")
+    public MateriaResponse actualizar(@PathVariable String id, @Valid @RequestBody MateriaRequest request) {
+        return MateriaResponse.from(materiaServices.actualizar(id, request.toEntity()));
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("@acceso.esGestor(authentication)")
     public ResponseEntity<Void> eliminar(@PathVariable String id) {
         materiaServices.eliminar(id);
         return ResponseEntity.noContent().build();

@@ -3,3 +3,6 @@ name: Listar Asistencia
 order: 2000
 method: GET
 url: '{{baseUrl}}/api/asistencia'
+headers:
+  - key: Authorization
+    value: 'Bearer {{token}}'

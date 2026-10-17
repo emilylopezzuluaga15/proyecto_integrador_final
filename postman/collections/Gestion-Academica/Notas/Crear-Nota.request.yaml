@@ -4,6 +4,8 @@ order: 1000
 method: POST
 url: '{{baseUrl}}/api/notas'
 headers:
+  - key: Authorization
+    value: 'Bearer {{token}}'
   - key: Content-Type
     value: application/json
 body:
@@ -12,7 +14,6 @@ body:
     {
       "definitiva": 4.5,
       "fechaRegistro": "2024-06-15",
-      "aprobada": true,
-      "estudiante": { "idEstudiante": "EST001" },
-      "materia": { "idMateria": "MAT001" }
+      "idEstudiante": "EST001",
+      "idMateria": "MAT001"
     }

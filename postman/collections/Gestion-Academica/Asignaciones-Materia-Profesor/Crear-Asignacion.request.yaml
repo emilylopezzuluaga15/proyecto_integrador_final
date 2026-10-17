@@ -4,13 +4,15 @@ order: 1000
 method: POST
 url: '{{baseUrl}}/api/asignaciones-materia-profesor'
 headers:
+  - key: Authorization
+    value: 'Bearer {{token}}'
   - key: Content-Type
     value: application/json
 body:
   type: json
   content: |-
     {
-      "profesor": { "idProfesor": "PROF001" },
-      "grupo": { "idGrupo": "GRP001" },
-      "materia": { "idMateria": "MAT001" }
+      "idProfesor": "PROF001",
+      "idGrupo": "GRP001",
+      "idMateria": "MAT001"
     }

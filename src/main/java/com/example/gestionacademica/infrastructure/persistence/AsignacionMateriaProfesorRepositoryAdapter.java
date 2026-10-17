@@ -70,4 +70,19 @@ public class AsignacionMateriaProfesorRepositoryAdapter implements AsignacionMat
     public long countByMateriaIdMateria(String idMateria) {
         return jpaRepository.countByMateriaIdMateria(idMateria);
     }
+
+    @Override
+    public boolean existsByProfesorIdProfesorAndMateriaIdMateria(String idProfesor, String idMateria) {
+        return jpaRepository.existsByProfesorIdProfesorAndMateriaIdMateria(idProfesor, idMateria);
+    }
+
+    @Override
+    public boolean existsByProfesorIdProfesorAndGrupoIdGrupo(String idProfesor, String idGrupo) {
+        return jpaRepository.existsByProfesorIdProfesorAndGrupoIdGrupo(idProfesor, idGrupo);
+    }
+
+    @Override
+    public boolean existsByProfesorIdProfesorAndGrupoIdGrupoAndMateriaIdMateria(String idProfesor, String idGrupo, String idMateria) {
+        return jpaRepository.existsByProfesorIdProfesorAndGrupoIdGrupoAndMateriaIdMateria(idProfesor, idGrupo, idMateria);
+    }
 }

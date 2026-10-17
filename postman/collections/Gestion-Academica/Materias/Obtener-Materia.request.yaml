@@ -3,3 +3,6 @@ name: Obtener Materia
 order: 3000
 method: GET
 url: '{{baseUrl}}/api/materias/{{id}}'
+headers:
+  - key: Authorization
+    value: 'Bearer {{token}}'

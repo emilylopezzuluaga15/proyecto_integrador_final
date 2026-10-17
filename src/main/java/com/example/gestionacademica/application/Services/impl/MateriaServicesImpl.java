@@ -9,10 +9,12 @@ import com.example.gestionacademica.domain.repository.MateriaRepository;
 import com.example.gestionacademica.domain.repository.NivelMateriaRepository;
 import com.example.gestionacademica.domain.repository.NotaRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
+@Transactional
 public class MateriaServicesImpl implements MateriaServices {
 
     private final MateriaRepository materiaRepository;

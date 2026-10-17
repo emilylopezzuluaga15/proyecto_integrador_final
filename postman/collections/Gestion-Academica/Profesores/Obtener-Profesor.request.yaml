@@ -3,3 +3,6 @@ name: Obtener Profesor
 order: 3000
 method: GET
 url: '{{baseUrl}}/api/profesores/{{id}}'
+headers:
+  - key: Authorization
+    value: 'Bearer {{token}}'

@@ -3,3 +3,6 @@ name: Listar Niveles
 order: 2000
 method: GET
 url: '{{baseUrl}}/api/niveles'
+headers:
+  - key: Authorization
+    value: 'Bearer {{token}}'

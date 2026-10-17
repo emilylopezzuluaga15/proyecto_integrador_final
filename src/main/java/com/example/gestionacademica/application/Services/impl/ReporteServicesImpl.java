@@ -19,6 +19,7 @@ import com.example.gestionacademica.domain.repository.MovimientoNotaRepository;
 import com.example.gestionacademica.domain.repository.NivelMateriaRepository;
 import com.example.gestionacademica.domain.repository.NotaRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -27,6 +28,7 @@ import java.util.Map;
 
 // Consultas de solo lectura que combinan información de varias tablas
 @Service
+@Transactional(readOnly = true)
 public class ReporteServicesImpl implements ReporteServices {
 
     private static final double PROMEDIO_MINIMO = 3.0;

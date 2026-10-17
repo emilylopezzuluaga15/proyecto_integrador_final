@@ -10,12 +10,14 @@ import com.example.gestionacademica.domain.repository.EstudianteRepository;
 import com.example.gestionacademica.domain.repository.MovimientoNotaRepository;
 import com.example.gestionacademica.domain.repository.NotaRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 @Service
+@Transactional
 public class NotaServicesImpl implements NotaServices {
 
     private static final float NOTA_MINIMA_APROBACION = 3.0f;

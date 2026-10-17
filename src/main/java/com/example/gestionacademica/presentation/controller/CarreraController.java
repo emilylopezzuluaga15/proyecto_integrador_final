@@ -1,14 +1,19 @@
 package com.example.gestionacademica.presentation.controller;
 
 import com.example.gestionacademica.application.Services.CarreraServices;
-import com.example.gestionacademica.domain.models.Carrera;
+import com.example.gestionacademica.presentation.dto.AlCrear;
+import com.example.gestionacademica.presentation.dto.CarreraDtos.CarreraRequest;
+import com.example.gestionacademica.presentation.dto.CarreraDtos.CarreraResponse;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import jakarta.validation.Valid;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+// Consulta: cualquier usuario autenticado. Cambios: ADMINISTRATIVO y COORDINADOR
 @RestController
 @RequestMapping("/api/carreras")
 public class CarreraController {
@@ -20,26 +25,30 @@ public class CarreraController {
     }
 
     @PostMapping
-    public ResponseEntity<Carrera> crear(@Valid @RequestBody Carrera carrera) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(carreraServices.crear(carrera));
+    @PreAuthorize("@acceso.esGestor(authentication)")
+    public ResponseEntity<CarreraResponse> crear(@Validated(AlCrear.class) @RequestBody CarreraRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(CarreraResponse.from(carreraServices.crear(request.toEntity())));
     }
 
     @GetMapping
-    public List<Carrera> listar() {
-        return carreraServices.obtenerTodos();
+    public List<CarreraResponse> listar() {
+        return carreraServices.obtenerTodos().stream().map(CarreraResponse::from).toList();
     }
 
     @GetMapping("/{id}")
-    public Carrera obtener(@PathVariable String id) {
-        return carreraServices.obtenerPorId(id);
+    public CarreraResponse obtener(@PathVariable String id) {
+        return CarreraResponse.from(carreraServices.obtenerPorId(id));
     }
 
     @PutMapping("/{id}")
-    public Carrera actualizar(@PathVariable String id, @Valid @RequestBody Carrera datos) {
-        return carreraServices.actualizar(id, datos);
+    @PreAuthorize("@acceso.esGestor(authentication)")
+    public CarreraResponse actualizar(@PathVariable String id, @Valid @RequestBody CarreraRequest request) {
+        return CarreraResponse.from(carreraServices.actualizar(id, request.toEntity()));
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("@acceso.esGestor(authentication)")
     public ResponseEntity<Void> eliminar(@PathVariable String id) {
         carreraServices.eliminar(id);
         return ResponseEntity.noContent().build();

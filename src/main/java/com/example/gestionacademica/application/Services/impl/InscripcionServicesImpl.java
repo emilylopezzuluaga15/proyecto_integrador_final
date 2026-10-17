@@ -13,12 +13,14 @@ import com.example.gestionacademica.domain.repository.EstudianteRepository;
 import com.example.gestionacademica.domain.repository.GrupoRepository;
 import com.example.gestionacademica.domain.repository.InscripcionRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 @Service
+@Transactional
 public class InscripcionServicesImpl implements InscripcionServices {
 
     private final InscripcionRepository inscripcionRepository;

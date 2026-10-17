@@ -1,55 +1,69 @@
 package com.example.gestionacademica.presentation.controller;
 
 import com.example.gestionacademica.application.Services.InscripcionServices;
-import com.example.gestionacademica.domain.models.Inscripcion;
+import com.example.gestionacademica.presentation.dto.InscripcionDtos.InscripcionRequest;
+import com.example.gestionacademica.presentation.dto.InscripcionDtos.InscripcionResponse;
+import com.example.gestionacademica.presentation.mapper.Referencias;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import jakarta.validation.Valid;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+// Consulta: personal; el estudiante solo las suyas. Cambios: ADMINISTRATIVO y COORDINADOR
 @RestController
 @RequestMapping("/api/inscripciones")
 public class InscripcionController {
 
     private final InscripcionServices inscripcionServices;
+    private final Referencias referencias;
 
-    public InscripcionController(InscripcionServices inscripcionServices) {
+    public InscripcionController(InscripcionServices inscripcionServices, Referencias referencias) {
         this.inscripcionServices = inscripcionServices;
+        this.referencias = referencias;
     }
 
     @PostMapping
-    public ResponseEntity<Inscripcion> crear(@Valid @RequestBody Inscripcion inscripcion) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(inscripcionServices.crear(inscripcion));
+    @PreAuthorize("@acceso.esGestor(authentication)")
+    public ResponseEntity<InscripcionResponse> crear(@Valid @RequestBody InscripcionRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(InscripcionResponse.from(inscripcionServices.crear(request.toEntity(referencias))));
     }
 
     @GetMapping
-    public List<Inscripcion> listar() {
-        return inscripcionServices.obtenerTodos();
+    @PreAuthorize("@acceso.esPersonal(authentication)")
+    public List<InscripcionResponse> listar() {
+        return inscripcionServices.obtenerTodos().stream().map(InscripcionResponse::from).toList();
     }
 
     @GetMapping("/estudiante/{idEstudiante}")
-    public List<Inscripcion> listarPorEstudiante(@PathVariable String idEstudiante) {
-        return inscripcionServices.obtenerPorEstudiante(idEstudiante);
+    @PreAuthorize("@acceso.puedeVerEstudiante(authentication, #idEstudiante)")
+    public List<InscripcionResponse> listarPorEstudiante(@PathVariable String idEstudiante) {
+        return inscripcionServices.obtenerPorEstudiante(idEstudiante).stream().map(InscripcionResponse::from).toList();
     }
 
     @GetMapping("/grupo/{idGrupo}")
-    public List<Inscripcion> listarPorGrupo(@PathVariable String idGrupo) {
-        return inscripcionServices.obtenerPorGrupo(idGrupo);
+    @PreAuthorize("@acceso.esPersonal(authentication)")
+    public List<InscripcionResponse> listarPorGrupo(@PathVariable String idGrupo) {
+        return inscripcionServices.obtenerPorGrupo(idGrupo).stream().map(InscripcionResponse::from).toList();
     }
 
     @GetMapping("/{id}")
-    public Inscripcion obtener(@PathVariable Long id) {
-        return inscripcionServices.obtenerPorId(id);
+    @PreAuthorize("@acceso.esPersonal(authentication)")
+    public InscripcionResponse obtener(@PathVariable Long id) {
+        return InscripcionResponse.from(inscripcionServices.obtenerPorId(id));
     }
 
     @PutMapping("/{id}")
-    public Inscripcion actualizar(@PathVariable Long id, @Valid @RequestBody Inscripcion datos) {
-        return inscripcionServices.actualizar(id, datos);
+    @PreAuthorize("@acceso.esGestor(authentication)")
+    public InscripcionResponse actualizar(@PathVariable Long id, @Valid @RequestBody InscripcionRequest request) {
+        return InscripcionResponse.from(inscripcionServices.actualizar(id, request.toEntity(referencias)));
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("@acceso.esGestor(authentication)")
     public ResponseEntity<Void> eliminar(@PathVariable Long id) {
         inscripcionServices.eliminar(id);
         return ResponseEntity.noContent().build();

@@ -1,50 +1,64 @@
 package com.example.gestionacademica.presentation.controller;
 
 import com.example.gestionacademica.application.Services.MovimientoNotaServices;
-import com.example.gestionacademica.domain.models.MovimientoNota;
+import com.example.gestionacademica.presentation.dto.MovimientoNotaDtos.MovimientoNotaRequest;
+import com.example.gestionacademica.presentation.dto.MovimientoNotaDtos.MovimientoNotaResponse;
+import com.example.gestionacademica.presentation.mapper.Referencias;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import jakarta.validation.Valid;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+// Consulta: personal; el estudiante solo las calificaciones de sus notas.
+// Registro: ADMINISTRATIVO, COORDINADOR y el PROFESOR asignado a la materia de la nota
 @RestController
 @RequestMapping("/api/movimiento-notas")
 public class MovimientoNotaController {
 
     private final MovimientoNotaServices movimientoNotaServices;
+    private final Referencias referencias;
 
-    public MovimientoNotaController(MovimientoNotaServices movimientoNotaServices) {
+    public MovimientoNotaController(MovimientoNotaServices movimientoNotaServices, Referencias referencias) {
         this.movimientoNotaServices = movimientoNotaServices;
+        this.referencias = referencias;
     }
 
     @PostMapping
-    public ResponseEntity<MovimientoNota> crear(@Valid @RequestBody MovimientoNota movimientoNota) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(movimientoNotaServices.crear(movimientoNota));
+    @PreAuthorize("@acceso.puedeModificarNota(authentication, #request.idNota())")
+    public ResponseEntity<MovimientoNotaResponse> crear(@Valid @RequestBody MovimientoNotaRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(MovimientoNotaResponse.from(movimientoNotaServices.crear(request.toEntity(referencias))));
     }
 
     @GetMapping
-    public List<MovimientoNota> listar() {
-        return movimientoNotaServices.obtenerTodos();
+    @PreAuthorize("@acceso.esPersonal(authentication)")
+    public List<MovimientoNotaResponse> listar() {
+        return movimientoNotaServices.obtenerTodos().stream().map(MovimientoNotaResponse::from).toList();
     }
 
     @GetMapping("/nota/{idNota}")
-    public List<MovimientoNota> listarPorNota(@PathVariable Long idNota) {
-        return movimientoNotaServices.obtenerPorNota(idNota);
+    @PreAuthorize("@acceso.puedeVerNota(authentication, #idNota)")
+    public List<MovimientoNotaResponse> listarPorNota(@PathVariable Long idNota) {
+        return movimientoNotaServices.obtenerPorNota(idNota).stream().map(MovimientoNotaResponse::from).toList();
     }
 
     @GetMapping("/{id}")
-    public MovimientoNota obtener(@PathVariable Long id) {
-        return movimientoNotaServices.obtenerPorId(id);
+    @PreAuthorize("@acceso.esPersonal(authentication)")
+    public MovimientoNotaResponse obtener(@PathVariable Long id) {
+        return MovimientoNotaResponse.from(movimientoNotaServices.obtenerPorId(id));
     }
 
     @PutMapping("/{id}")
-    public MovimientoNota actualizar(@PathVariable Long id, @Valid @RequestBody MovimientoNota datos) {
-        return movimientoNotaServices.actualizar(id, datos);
+    @PreAuthorize("@acceso.puedeModificarMovimiento(authentication, #id) and @acceso.puedeModificarNota(authentication, #request.idNota())")
+    public MovimientoNotaResponse actualizar(@PathVariable Long id, @Valid @RequestBody MovimientoNotaRequest request) {
+        return MovimientoNotaResponse.from(movimientoNotaServices.actualizar(id, request.toEntity(referencias)));
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("@acceso.puedeModificarMovimiento(authentication, #id)")
     public ResponseEntity<Void> eliminar(@PathVariable Long id) {
         movimientoNotaServices.eliminar(id);
         return ResponseEntity.noContent().build();

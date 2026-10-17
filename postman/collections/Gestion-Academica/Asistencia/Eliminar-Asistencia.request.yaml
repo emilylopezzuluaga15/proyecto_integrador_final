@@ -3,3 +3,6 @@ name: Eliminar Asistencia
 order: 5000
 method: DELETE
 url: '{{baseUrl}}/api/asistencia/{{id}}'
+headers:
+  - key: Authorization
+    value: 'Bearer {{token}}'

@@ -4,6 +4,8 @@ order: 4000
 method: PUT
 url: '{{baseUrl}}/api/niveles/{{id}}'
 headers:
+  - key: Authorization
+    value: 'Bearer {{token}}'
   - key: Content-Type
     value: application/json
 body:
@@ -12,5 +14,5 @@ body:
     {
       "idNivel": "NIV001",
       "nombreNivel": "Primer Semestre Actualizado",
-      "carrera": { "idCarrera": "CAR001" }
+      "idCarrera": "CAR001"
     }

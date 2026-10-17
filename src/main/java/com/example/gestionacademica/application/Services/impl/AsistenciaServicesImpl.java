@@ -9,6 +9,7 @@ import com.example.gestionacademica.domain.repository.AsistenciaRepository;
 import com.example.gestionacademica.domain.repository.EstudianteRepository;
 import com.example.gestionacademica.domain.repository.InscripcionRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.LinkedHashMap;
@@ -16,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 @Service
+@Transactional
 public class AsistenciaServicesImpl implements AsistenciaServices {
 
     private final AsistenciaRepository asistenciaRepository;

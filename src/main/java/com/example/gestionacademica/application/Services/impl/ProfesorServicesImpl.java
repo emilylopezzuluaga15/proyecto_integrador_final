@@ -7,10 +7,12 @@ import com.example.gestionacademica.domain.models.Profesor;
 import com.example.gestionacademica.domain.repository.AsignacionMateriaProfesorRepository;
 import com.example.gestionacademica.domain.repository.ProfesorRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
+@Transactional
 public class ProfesorServicesImpl implements ProfesorServices {
 
     private final ProfesorRepository profesorRepository;

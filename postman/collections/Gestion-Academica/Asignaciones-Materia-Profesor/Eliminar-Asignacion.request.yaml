@@ -3,3 +3,6 @@ name: Eliminar Asignacion
 order: 5000
 method: DELETE
 url: '{{baseUrl}}/api/asignaciones-materia-profesor/{{id}}'
+headers:
+  - key: Authorization
+    value: 'Bearer {{token}}'

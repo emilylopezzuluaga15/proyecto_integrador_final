@@ -6,10 +6,12 @@ import com.example.gestionacademica.application.Services.NivelMateriaServices;
 import com.example.gestionacademica.domain.models.NivelMateria;
 import com.example.gestionacademica.domain.repository.NivelMateriaRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
+@Transactional
 public class NivelMateriaServicesImpl implements NivelMateriaServices {
 
     private final NivelMateriaRepository nivelMateriaRepository;

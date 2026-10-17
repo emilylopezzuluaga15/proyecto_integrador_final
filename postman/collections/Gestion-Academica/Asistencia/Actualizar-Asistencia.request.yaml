@@ -4,6 +4,8 @@ order: 4000
 method: PUT
 url: '{{baseUrl}}/api/asistencia/{{id}}'
 headers:
+  - key: Authorization
+    value: 'Bearer {{token}}'
   - key: Content-Type
     value: application/json
 body:
@@ -12,6 +14,6 @@ body:
     {
       "fechaAsistencia": "2024-05-10",
       "asistio": false,
-      "estudiante": { "idEstudiante": "EST001" },
-      "grupo": { "idGrupo": "GRP001" }
+      "idEstudiante": "EST001",
+      "idGrupo": "GRP001"
     }
