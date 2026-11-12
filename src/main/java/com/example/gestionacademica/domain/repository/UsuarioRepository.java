@@ -20,6 +20,8 @@ public interface UsuarioRepository {
 
     boolean existsByRol(Rol rol);
 
+    long countByRolAndActivoTrue(Rol rol);
+
     Optional<Usuario> findByUsername(String username);
 
     boolean existsByUsername(String username);

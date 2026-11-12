@@ -35,7 +35,7 @@ public class GrupoServicesImpl implements GrupoServices {
     @Override
     public Grupo crear(Grupo grupo) {
         if (grupoRepository.existsById(grupo.getIdGrupo())) {
-            throw new BusinessException("Grupo ya existe con id: " + grupo.getIdGrupo());
+            throw new BusinessException("YA_EXISTE", "Grupo ya existe con id: " + grupo.getIdGrupo());
         }
         return grupoRepository.save(grupo);
     }
@@ -69,7 +69,7 @@ public class GrupoServicesImpl implements GrupoServices {
         long asignaciones = asignacionMateriaProfesorRepository.countByGrupoIdGrupo(id);
         long asistencias = asistenciaRepository.countByGrupoIdGrupo(id);
         if (inscripciones > 0 || asignaciones > 0 || asistencias > 0) {
-            throw new BusinessException("No se puede eliminar el grupo " + id + " porque tiene "
+            throw new BusinessException("TIENE_DEPENDENCIAS", "No se puede eliminar el grupo " + id + " porque tiene "
                     + inscripciones + " inscripciones, " + asignaciones + " asignaciones de profesor y "
                     + asistencias + " registros de asistencia");
         }

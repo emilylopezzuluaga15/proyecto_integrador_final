@@ -42,7 +42,7 @@ public class AsistenciaServicesImpl implements AsistenciaServices {
     @Override
     public Asistencia obtenerPorId(Long id) {
         return asistenciaRepository.findById(id)
-                .orElseThrow(() -> new AsistenciaNotFoundException("Asistencia no encontrado con id: " + id));
+                .orElseThrow(() -> new AsistenciaNotFoundException("Asistencia no encontrada con id: " + id));
     }
 
     @Override
@@ -98,7 +98,7 @@ public class AsistenciaServicesImpl implements AsistenciaServices {
     @Override
     public void eliminar(Long id) {
         if (!asistenciaRepository.existsById(id)) {
-            throw new AsistenciaNotFoundException("Asistencia no encontrado con id: " + id);
+            throw new AsistenciaNotFoundException("Asistencia no encontrada con id: " + id);
         }
         asistenciaRepository.deleteById(id);
     }
@@ -110,15 +110,15 @@ public class AsistenciaServicesImpl implements AsistenciaServices {
 
         // 1. No se registra asistencia a futuro
         if (fecha.isAfter(LocalDate.now())) {
-            throw new BusinessException("No se puede registrar asistencia en una fecha futura: " + fecha);
+            throw new BusinessException("FECHA_FUTURA", "No se puede registrar asistencia en una fecha futura: " + fecha);
         }
         // 2. El estudiante debe estar inscrito en el grupo
         if (!inscripcionRepository.existsByEstudianteIdEstudianteAndGrupoIdGrupo(idEstudiante, idGrupo)) {
-            throw new BusinessException("El estudiante " + idEstudiante + " no está inscrito en el grupo " + idGrupo);
+            throw new BusinessException("ESTUDIANTE_NO_INSCRITO", "El estudiante " + idEstudiante + " no está inscrito en el grupo " + idGrupo);
         }
         // 3. Un solo registro por estudiante, grupo y fecha
         if (asistenciaRepository.existsByEstudianteIdEstudianteAndGrupoIdGrupoAndFechaAsistencia(idEstudiante, idGrupo, fecha)) {
-            throw new BusinessException("Ya existe un registro de asistencia del estudiante " + idEstudiante
+            throw new BusinessException("ASISTENCIA_DUPLICADA", "Ya existe un registro de asistencia del estudiante " + idEstudiante
                     + " en el grupo " + idGrupo + " para la fecha " + fecha);
         }
     }
@@ -126,7 +126,7 @@ public class AsistenciaServicesImpl implements AsistenciaServices {
     // Solo una inasistencia puede quedar justificada
     private void validarJustificacion(Asistencia asistencia) {
         if (asistencia.getAsistio() && asistencia.getJustificada() != null && asistencia.getJustificada()) {
-            throw new BusinessException("Solo se puede justificar una inasistencia (asistio debe ser false)");
+            throw new BusinessException("JUSTIFICACION_INVALIDA", "Solo se puede justificar una inasistencia (asistio debe ser false)");
         }
     }
 

@@ -44,7 +44,7 @@ public class NotaServicesImpl implements NotaServices {
     @Override
     public Nota obtenerPorId(Long id) {
         return notaRepository.findById(id)
-                .orElseThrow(() -> new NotaNotFoundException("Nota no encontrado con id: " + id));
+                .orElseThrow(() -> new NotaNotFoundException("Nota no encontrada con id: " + id));
     }
 
     @Override
@@ -117,11 +117,11 @@ public class NotaServicesImpl implements NotaServices {
     @Override
     public void eliminar(Long id) {
         if (!notaRepository.existsById(id)) {
-            throw new NotaNotFoundException("Nota no encontrado con id: " + id);
+            throw new NotaNotFoundException("Nota no encontrada con id: " + id);
         }
         int movimientos = movimientoNotaRepository.findByNotaIdNota(id).size();
         if (movimientos > 0) {
-            throw new BusinessException("La nota " + id + " tiene " + movimientos
+            throw new BusinessException("TIENE_DEPENDENCIAS", "La nota " + id + " tiene " + movimientos
                     + " calificaciones registradas; elimínalas antes de borrar la nota");
         }
         notaRepository.deleteById(id);
@@ -156,7 +156,7 @@ public class NotaServicesImpl implements NotaServices {
         List<Nota> notasMateria = notaRepository.findByEstudianteIdEstudianteAndMateriaIdMateria(idEstudiante, idMateria);
         for (Nota existente : notasMateria) {
             if (existente.getAprobada() == null || existente.getAprobada()) {
-                throw new BusinessException("El estudiante " + idEstudiante
+                throw new BusinessException("NOTA_DUPLICADA", "El estudiante " + idEstudiante
                         + " ya tiene una nota en curso o aprobada para la materia " + idMateria);
             }
         }

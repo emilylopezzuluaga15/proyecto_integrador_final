@@ -1,6 +1,7 @@
 package com.example.gestionacademica.application.Services.impl;
 
 import com.example.gestionacademica.application.Exceptions.CredencialesInvalidasException;
+import com.example.gestionacademica.application.Exceptions.CuentaDesactivadaException;
 import com.example.gestionacademica.application.Services.AuthServices;
 import com.example.gestionacademica.application.Services.Sesion;
 import com.example.gestionacademica.application.Services.TokenServices;
@@ -26,13 +27,17 @@ public class AuthServicesImpl implements AuthServices {
         this.tokenServices = tokenServices;
     }
 
-    // Mismo mensaje para usuario inexistente, inactivo o clave errada: no se revela cuál falló
+    // Mismo mensaje para usuario inexistente o clave errada: no se revela cuál falló.
+    // Que la cuenta está desactivada solo se informa si la clave es correcta
     @Override
     public Sesion login(String username, String password) {
         Usuario usuario = usuarioRepository.findByUsername(username)
                 .orElseThrow(() -> new CredencialesInvalidasException("Usuario o contraseña incorrectos"));
-        if (!usuario.getActivo() || !passwordEncoder.matches(password, usuario.getPasswordHash())) {
+        if (!passwordEncoder.matches(password, usuario.getPasswordHash())) {
             throw new CredencialesInvalidasException("Usuario o contraseña incorrectos");
+        }
+        if (!usuario.getActivo()) {
+            throw new CuentaDesactivadaException("Tu cuenta está desactivada");
         }
         return tokenServices.generar(usuario);
     }

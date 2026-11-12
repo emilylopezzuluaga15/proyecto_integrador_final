@@ -37,7 +37,7 @@ public class JwtTokenServices implements TokenServices {
                 .issuedAt(ahora)
                 .expiresAt(expiraEn)
                 .subject(usuario.getUsername())
-                .claim("idUsuario", usuario.getIdUsuario())
+                .claim(AccesoService.CLAIM_USUARIO, usuario.getIdUsuario())
                 .claim(AccesoService.CLAIM_ROL, usuario.getRol().name());
         if (usuario.getEstudiante() != null) {
             claims.claim(AccesoService.CLAIM_ESTUDIANTE, usuario.getEstudiante().getIdEstudiante());

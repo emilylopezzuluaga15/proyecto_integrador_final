@@ -19,6 +19,7 @@ Los controladores reciben y devuelven **DTOs** (`presentation/dto`), nunca entid
 
 1. **Base de datos.** En MySQL Workbench ejecuta:
    - `db/schema.sql`: crea la BD `sistema_academico` y sus tablas. Usa `IF NOT EXISTS`, así que sobre una BD existente solo agrega lo que falte (por ejemplo, la tabla `usuarios`).
+   - `db/migracion_bd_existente.sql` (solo si tu BD ya existía antes de `schema.sql`): cambia `anio_inscripcion` de `YEAR` a `INT` y agrega los índices únicos que falten. Se ejecuta una sola vez.
    - `db/data.sql` (opcional, solo con la BD vacía): datos y usuarios de demostración.
 2. **Configuración local.** Copia `src/main/resources/application-local.properties.example` como `application-local.properties` en la misma carpeta y pon tus valores. Ese archivo está en `.gitignore`. También puedes usar las variables de entorno `DB_PASSWORD`, `JWT_SECRET` y `ADMIN_PASSWORD`.
 3. **Arrancar:** `./mvnw spring-boot:run` (o ejecuta `GestionAcademicaApplication` desde IntelliJ).

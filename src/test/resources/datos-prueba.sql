@@ -23,3 +23,12 @@ INSERT INTO usuarios (Username, Password_Hash, Rol, Activo, ID_Estudiante, ID_Pr
     ('coordinador', '$2a$10$BBvTuUAAk0WmAG7LpzGUfOUVSKpXwl4cUg40AaXvfWZRJ.cEiUo6K', 'COORDINADOR', TRUE, NULL, NULL),
     ('profesor1', '$2a$10$BBvTuUAAk0WmAG7LpzGUfOUVSKpXwl4cUg40AaXvfWZRJ.cEiUo6K', 'PROFESOR', TRUE, NULL, 'PROF001'),
     ('est001', '$2a$10$BBvTuUAAk0WmAG7LpzGUfOUVSKpXwl4cUg40AaXvfWZRJ.cEiUo6K', 'ESTUDIANTE', TRUE, 'EST001', NULL);
+-- Segundo grupo que profesor1 (PROF001) NO dicta: sirve para comprobar que sus listados no lo incluyen
+INSERT INTO grupos (ID_Grupo, Nombre_Grupo, ID_Nivel, Cupo_Maximo) VALUES ('GRP002', 'Sistemas 1B', 'SIS-1', 30);
+INSERT INTO asignaciones_materia_profesor (ID_Profesor, ID_Grupo, ID_Materia) VALUES ('PROF002', 'GRP002', 'MAT002');
+INSERT INTO estudiantes (ID_Estudiante, Nombre_Estudiante, Fecha_Ingreso, Activo, Estado) VALUES
+    ('EST003', 'Ana Ruiz', '2026-01-20', TRUE, 'Activo');
+INSERT INTO inscripciones (anio_inscripcion, ID_Estudiante, ID_Grupo) VALUES (2026, 'EST003', 'GRP002');
+INSERT INTO asistencia (Fecha_Asistencia, Asistio, Justificada, ID_Estudiante, ID_Grupo) VALUES
+    ('2026-03-02', TRUE, FALSE, 'EST001', 'GRP001'),
+    ('2026-03-02', FALSE, FALSE, 'EST003', 'GRP002');

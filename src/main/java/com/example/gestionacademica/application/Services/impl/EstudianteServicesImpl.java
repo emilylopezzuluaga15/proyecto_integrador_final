@@ -35,10 +35,10 @@ public class EstudianteServicesImpl implements EstudianteServices {
     @Override
     public Estudiante crear(Estudiante estudiante) {
         if (estudianteRepository.existsById(estudiante.getIdEstudiante())) {
-            throw new BusinessException("Estudiante ya existe con id: " + estudiante.getIdEstudiante());
+            throw new BusinessException("YA_EXISTE", "Estudiante ya existe con id: " + estudiante.getIdEstudiante());
         }
         if (estudiante.getCorreo() != null && estudianteRepository.existsByCorreo(estudiante.getCorreo())) {
-            throw new BusinessException("Ya existe un estudiante con el correo: " + estudiante.getCorreo());
+            throw new BusinessException("CORREO_DUPLICADO", "Ya existe un estudiante con el correo: " + estudiante.getCorreo());
         }
         return estudianteRepository.save(estudiante);
     }
@@ -61,7 +61,7 @@ public class EstudianteServicesImpl implements EstudianteServices {
         // Solo se revisa el correo si cambió, para no chocar con el mismo estudiante
         boolean cambioCorreo = datos.getCorreo() != null && !datos.getCorreo().equals(existente.getCorreo());
         if (cambioCorreo && estudianteRepository.existsByCorreo(datos.getCorreo())) {
-            throw new BusinessException("Ya existe un estudiante con el correo: " + datos.getCorreo());
+            throw new BusinessException("CORREO_DUPLICADO", "Ya existe un estudiante con el correo: " + datos.getCorreo());
         }
 
         existente.setNombreEstudiante(datos.getNombreEstudiante());
@@ -83,7 +83,7 @@ public class EstudianteServicesImpl implements EstudianteServices {
         long notas = notaRepository.countByEstudianteIdEstudiante(id);
         long asistencias = asistenciaRepository.countByEstudianteIdEstudiante(id);
         if (inscripciones > 0 || notas > 0 || asistencias > 0) {
-            throw new BusinessException("No se puede eliminar el estudiante " + id + " porque tiene "
+            throw new BusinessException("TIENE_DEPENDENCIAS", "No se puede eliminar el estudiante " + id + " porque tiene "
                     + inscripciones + " inscripciones, " + notas + " notas y " + asistencias
                     + " registros de asistencia");
         }

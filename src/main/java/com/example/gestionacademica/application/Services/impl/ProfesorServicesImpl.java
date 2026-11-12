@@ -27,10 +27,10 @@ public class ProfesorServicesImpl implements ProfesorServices {
     @Override
     public Profesor crear(Profesor profesor) {
         if (profesorRepository.existsById(profesor.getIdProfesor())) {
-            throw new BusinessException("Profesor ya existe con id: " + profesor.getIdProfesor());
+            throw new BusinessException("YA_EXISTE", "Profesor ya existe con id: " + profesor.getIdProfesor());
         }
         if (profesor.getCorreo() != null && profesorRepository.existsByCorreo(profesor.getCorreo())) {
-            throw new BusinessException("Ya existe un profesor con el correo: " + profesor.getCorreo());
+            throw new BusinessException("CORREO_DUPLICADO", "Ya existe un profesor con el correo: " + profesor.getCorreo());
         }
         return profesorRepository.save(profesor);
     }
@@ -53,7 +53,7 @@ public class ProfesorServicesImpl implements ProfesorServices {
         // Solo se revisa el correo si cambió, para no chocar con el mismo profesor
         boolean cambioCorreo = datos.getCorreo() != null && !datos.getCorreo().equals(existente.getCorreo());
         if (cambioCorreo && profesorRepository.existsByCorreo(datos.getCorreo())) {
-            throw new BusinessException("Ya existe un profesor con el correo: " + datos.getCorreo());
+            throw new BusinessException("CORREO_DUPLICADO", "Ya existe un profesor con el correo: " + datos.getCorreo());
         }
 
         existente.setNombreProfesor(datos.getNombreProfesor());
@@ -73,7 +73,7 @@ public class ProfesorServicesImpl implements ProfesorServices {
         }
         long asignaciones = asignacionMateriaProfesorRepository.countByProfesorIdProfesor(id);
         if (asignaciones > 0) {
-            throw new BusinessException("No se puede eliminar el profesor " + id + " porque tiene "
+            throw new BusinessException("TIENE_DEPENDENCIAS", "No se puede eliminar el profesor " + id + " porque tiene "
                     + asignaciones + " asignaciones de materias");
         }
         profesorRepository.deleteById(id);

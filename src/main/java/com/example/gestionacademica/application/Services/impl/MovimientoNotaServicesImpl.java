@@ -35,7 +35,7 @@ public class MovimientoNotaServicesImpl implements MovimientoNotaServices {
     @Override
     public MovimientoNota obtenerPorId(Long id) {
         return movimientoNotaRepository.findById(id)
-                .orElseThrow(() -> new MovimientoNotaNotFoundException("MovimientoNota no encontrado con id: " + id));
+                .orElseThrow(() -> new MovimientoNotaNotFoundException("Movimiento de nota no encontrado con id: " + id));
     }
 
     @Override

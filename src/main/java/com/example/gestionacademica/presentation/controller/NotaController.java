@@ -1,6 +1,7 @@
 package com.example.gestionacademica.presentation.controller;
 
 import com.example.gestionacademica.application.Services.NotaServices;
+import com.example.gestionacademica.infrastructure.security.AccesoService;
 import com.example.gestionacademica.presentation.dto.NotaDtos.NotaRequest;
 import com.example.gestionacademica.presentation.dto.NotaDtos.NotaResponse;
 import com.example.gestionacademica.presentation.mapper.Referencias;
@@ -8,12 +9,13 @@ import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
 
-// Consulta: personal; el estudiante solo las suyas.
+// Consulta: personal (el listado general del PROFESOR se limita a sus materias); el estudiante solo las suyas.
 // Registro: ADMINISTRATIVO, COORDINADOR y el PROFESOR asignado a esa materia
 @RestController
 @RequestMapping("/api/notas")
@@ -21,10 +23,12 @@ public class NotaController {
 
     private final NotaServices notaServices;
     private final Referencias referencias;
+    private final AccesoService acceso;
 
-    public NotaController(NotaServices notaServices, Referencias referencias) {
+    public NotaController(NotaServices notaServices, Referencias referencias, AccesoService acceso) {
         this.notaServices = notaServices;
         this.referencias = referencias;
+        this.acceso = acceso;
     }
 
     @PostMapping
@@ -36,8 +40,8 @@ public class NotaController {
 
     @GetMapping
     @PreAuthorize("@acceso.esPersonal(authentication)")
-    public List<NotaResponse> listar() {
-        return notaServices.obtenerTodos().stream().map(NotaResponse::from).toList();
+    public List<NotaResponse> listar(Authentication authentication) {
+        return acceso.soloMateriasAsignadas(authentication, notaServices.obtenerTodos(), n -> n.getMateria().getIdMateria()).stream().map(NotaResponse::from).toList();
     }
 
     @GetMapping("/estudiante/{idEstudiante}")

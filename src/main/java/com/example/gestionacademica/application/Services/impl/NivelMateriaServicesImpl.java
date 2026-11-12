@@ -29,7 +29,7 @@ public class NivelMateriaServicesImpl implements NivelMateriaServices {
     @Override
     public NivelMateria obtenerPorId(Long id) {
         return nivelMateriaRepository.findById(id)
-                .orElseThrow(() -> new NivelMateriaNotFoundException("NivelMateria no encontrado con id: " + id));
+                .orElseThrow(() -> new NivelMateriaNotFoundException("Materia del plan de estudios no encontrada con id: " + id));
     }
 
     @Override
@@ -53,7 +53,7 @@ public class NivelMateriaServicesImpl implements NivelMateriaServices {
     @Override
     public void eliminar(Long id) {
         if (!nivelMateriaRepository.existsById(id)) {
-            throw new NivelMateriaNotFoundException("NivelMateria no encontrado con id: " + id);
+            throw new NivelMateriaNotFoundException("Materia del plan de estudios no encontrada con id: " + id);
         }
         nivelMateriaRepository.deleteById(id);
     }
@@ -62,7 +62,7 @@ public class NivelMateriaServicesImpl implements NivelMateriaServices {
         String idNivel = nivelMateria.getNivel().getIdNivel();
         String idMateria = nivelMateria.getMateria().getIdMateria();
         if (nivelMateriaRepository.existsByNivelIdNivelAndMateriaIdMateria(idNivel, idMateria)) {
-            throw new BusinessException("La materia " + idMateria + " ya está asociada al nivel " + idNivel);
+            throw new BusinessException("MATERIA_YA_ASOCIADA", "La materia " + idMateria + " ya está asociada al nivel " + idNivel);
         }
     }
 }

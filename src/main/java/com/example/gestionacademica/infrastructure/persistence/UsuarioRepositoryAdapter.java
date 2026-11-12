@@ -48,6 +48,11 @@ public class UsuarioRepositoryAdapter implements UsuarioRepository {
     }
 
     @Override
+    public long countByRolAndActivoTrue(Rol rol) {
+        return jpaRepository.countByRolAndActivoTrue(rol);
+    }
+
+    @Override
     public Optional<Usuario> findByUsername(String username) {
         return jpaRepository.findByUsername(username);
     }

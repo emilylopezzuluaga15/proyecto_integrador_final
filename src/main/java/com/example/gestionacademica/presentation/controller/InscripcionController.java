@@ -1,6 +1,7 @@
 package com.example.gestionacademica.presentation.controller;
 
 import com.example.gestionacademica.application.Services.InscripcionServices;
+import com.example.gestionacademica.infrastructure.security.AccesoService;
 import com.example.gestionacademica.presentation.dto.InscripcionDtos.InscripcionRequest;
 import com.example.gestionacademica.presentation.dto.InscripcionDtos.InscripcionResponse;
 import com.example.gestionacademica.presentation.mapper.Referencias;
@@ -8,21 +9,24 @@ import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-// Consulta: personal; el estudiante solo las suyas. Cambios: ADMINISTRATIVO y COORDINADOR
+// Consulta: personal (el listado general del PROFESOR se limita a sus grupos); el estudiante solo las suyas. Cambios: ADMINISTRATIVO y COORDINADOR
 @RestController
 @RequestMapping("/api/inscripciones")
 public class InscripcionController {
 
     private final InscripcionServices inscripcionServices;
     private final Referencias referencias;
+    private final AccesoService acceso;
 
-    public InscripcionController(InscripcionServices inscripcionServices, Referencias referencias) {
+    public InscripcionController(InscripcionServices inscripcionServices, Referencias referencias, AccesoService acceso) {
         this.inscripcionServices = inscripcionServices;
         this.referencias = referencias;
+        this.acceso = acceso;
     }
 
     @PostMapping
@@ -34,8 +38,8 @@ public class InscripcionController {
 
     @GetMapping
     @PreAuthorize("@acceso.esPersonal(authentication)")
-    public List<InscripcionResponse> listar() {
-        return inscripcionServices.obtenerTodos().stream().map(InscripcionResponse::from).toList();
+    public List<InscripcionResponse> listar(Authentication authentication) {
+        return acceso.soloGruposAsignados(authentication, inscripcionServices.obtenerTodos(), i -> i.getGrupo().getIdGrupo()).stream().map(InscripcionResponse::from).toList();
     }
 
     @GetMapping("/estudiante/{idEstudiante}")

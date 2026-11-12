@@ -31,7 +31,7 @@ public class NivelServicesImpl implements NivelServices {
     @Override
     public Nivel crear(Nivel nivel) {
         if (nivelRepository.existsById(nivel.getIdNivel())) {
-            throw new BusinessException("Nivel ya existe con id: " + nivel.getIdNivel());
+            throw new BusinessException("YA_EXISTE", "Nivel ya existe con id: " + nivel.getIdNivel());
         }
         return nivelRepository.save(nivel);
     }
@@ -63,7 +63,7 @@ public class NivelServicesImpl implements NivelServices {
         long grupos = grupoRepository.countByNivelIdNivel(id);
         long materias = nivelMateriaRepository.countByNivelIdNivel(id);
         if (grupos > 0 || materias > 0) {
-            throw new BusinessException("No se puede eliminar el nivel " + id + " porque tiene "
+            throw new BusinessException("TIENE_DEPENDENCIAS", "No se puede eliminar el nivel " + id + " porque tiene "
                     + grupos + " grupos y " + materias + " materias asociadas");
         }
         nivelRepository.deleteById(id);

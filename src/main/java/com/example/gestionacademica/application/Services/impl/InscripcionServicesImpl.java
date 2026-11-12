@@ -44,7 +44,7 @@ public class InscripcionServicesImpl implements InscripcionServices {
     @Override
     public Inscripcion obtenerPorId(Long id) {
         return inscripcionRepository.findById(id)
-                .orElseThrow(() -> new InscripcionNotFoundException("Inscripcion no encontrado con id: " + id));
+                .orElseThrow(() -> new InscripcionNotFoundException("Inscripción no encontrada con id: " + id));
     }
 
     @Override
@@ -102,7 +102,7 @@ public class InscripcionServicesImpl implements InscripcionServices {
     @Override
     public void eliminar(Long id) {
         if (!inscripcionRepository.existsById(id)) {
-            throw new InscripcionNotFoundException("Inscripcion no encontrado con id: " + id);
+            throw new InscripcionNotFoundException("Inscripción no encontrada con id: " + id);
         }
         inscripcionRepository.deleteById(id);
     }
@@ -116,12 +116,12 @@ public class InscripcionServicesImpl implements InscripcionServices {
         Estudiante estudiante = estudianteRepository.findById(idEstudiante)
                 .orElseThrow(() -> new EstudianteNotFoundException("Estudiante no encontrado con id: " + idEstudiante));
         if (!estudiante.getActivo() || (estudiante.getEstado() != null && estudiante.getEstado() != EstadoEstudiante.Activo)) {
-            throw new BusinessException("El estudiante " + idEstudiante + " no está activo y no puede inscribirse");
+            throw new BusinessException("ESTUDIANTE_INACTIVO", "El estudiante " + idEstudiante + " no está activo y no puede inscribirse");
         }
 
         // 2. No puede estar inscrito dos veces en el mismo grupo el mismo año
         if (inscripcionRepository.existsByEstudianteIdEstudianteAndGrupoIdGrupoAndAnioInscripcion(idEstudiante, idGrupo, anio)) {
-            throw new BusinessException("El estudiante " + idEstudiante + " ya está inscrito en el grupo "
+            throw new BusinessException("INSCRIPCION_DUPLICADA", "El estudiante " + idEstudiante + " ya está inscrito en el grupo "
                     + idGrupo + " para el año " + anio);
         }
 
@@ -130,7 +130,7 @@ public class InscripcionServicesImpl implements InscripcionServices {
         if (grupo.getCupoMaximo() != null) {
             long inscritos = inscripcionRepository.countByGrupoIdGrupoAndAnioInscripcion(idGrupo, anio);
             if (inscritos >= grupo.getCupoMaximo()) {
-                throw new BusinessException("El grupo " + idGrupo + " no tiene cupo disponible para el año " + anio
+                throw new BusinessException("CUPO_LLENO", "El grupo " + idGrupo + " no tiene cupo disponible para el año " + anio
                         + " (cupo máximo: " + grupo.getCupoMaximo() + ")");
             }
         }

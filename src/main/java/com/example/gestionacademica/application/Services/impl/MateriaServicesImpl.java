@@ -35,7 +35,7 @@ public class MateriaServicesImpl implements MateriaServices {
     @Override
     public Materia crear(Materia materia) {
         if (materiaRepository.existsById(materia.getIdMateria())) {
-            throw new BusinessException("Materia ya existe con id: " + materia.getIdMateria());
+            throw new BusinessException("YA_EXISTE", "Materia ya existe con id: " + materia.getIdMateria());
         }
         return materiaRepository.save(materia);
     }
@@ -43,7 +43,7 @@ public class MateriaServicesImpl implements MateriaServices {
     @Override
     public Materia obtenerPorId(String id) {
         return materiaRepository.findById(id)
-                .orElseThrow(() -> new MateriaNotFoundException("Materia no encontrado con id: " + id));
+                .orElseThrow(() -> new MateriaNotFoundException("Materia no encontrada con id: " + id));
     }
 
     @Override
@@ -61,13 +61,13 @@ public class MateriaServicesImpl implements MateriaServices {
     @Override
     public void eliminar(String id) {
         if (!materiaRepository.existsById(id)) {
-            throw new MateriaNotFoundException("Materia no encontrado con id: " + id);
+            throw new MateriaNotFoundException("Materia no encontrada con id: " + id);
         }
         long niveles = nivelMateriaRepository.countByMateriaIdMateria(id);
         long asignaciones = asignacionMateriaProfesorRepository.countByMateriaIdMateria(id);
         long notas = notaRepository.countByMateriaIdMateria(id);
         if (niveles > 0 || asignaciones > 0 || notas > 0) {
-            throw new BusinessException("No se puede eliminar la materia " + id + " porque tiene "
+            throw new BusinessException("TIENE_DEPENDENCIAS", "No se puede eliminar la materia " + id + " porque tiene "
                     + niveles + " niveles asociados, " + asignaciones + " asignaciones de profesor y " + notas + " notas");
         }
         materiaRepository.deleteById(id);

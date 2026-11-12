@@ -27,7 +27,7 @@ public class CarreraServicesImpl implements CarreraServices {
     @Override
     public Carrera crear(Carrera carrera) {
         if (carreraRepository.existsById(carrera.getIdCarrera())) {
-            throw new BusinessException("Carrera ya existe con id: " + carrera.getIdCarrera());
+            throw new BusinessException("YA_EXISTE", "Carrera ya existe con id: " + carrera.getIdCarrera());
         }
         return carreraRepository.save(carrera);
     }
@@ -35,7 +35,7 @@ public class CarreraServicesImpl implements CarreraServices {
     @Override
     public Carrera obtenerPorId(String id) {
         return carreraRepository.findById(id)
-                .orElseThrow(() -> new CarreraNotFoundException("Carrera no encontrado con id: " + id));
+                .orElseThrow(() -> new CarreraNotFoundException("Carrera no encontrada con id: " + id));
     }
 
     @Override
@@ -53,11 +53,11 @@ public class CarreraServicesImpl implements CarreraServices {
     @Override
     public void eliminar(String id) {
         if (!carreraRepository.existsById(id)) {
-            throw new CarreraNotFoundException("Carrera no encontrado con id: " + id);
+            throw new CarreraNotFoundException("Carrera no encontrada con id: " + id);
         }
         long niveles = nivelRepository.countByCarreraIdCarrera(id);
         if (niveles > 0) {
-            throw new BusinessException("No se puede eliminar la carrera " + id + " porque tiene "
+            throw new BusinessException("TIENE_DEPENDENCIAS", "No se puede eliminar la carrera " + id + " porque tiene "
                     + niveles + " niveles");
         }
         carreraRepository.deleteById(id);

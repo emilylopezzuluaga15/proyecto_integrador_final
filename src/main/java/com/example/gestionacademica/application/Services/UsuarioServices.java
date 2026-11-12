@@ -14,8 +14,8 @@ public interface UsuarioServices {
 
     List<Usuario> obtenerTodos();
 
-    // password puede ser null para conservar la actual
-    Usuario actualizar(Long id, Usuario datos, String password);
+    // password puede ser null para conservar la actual; idUsuarioActual es quien hace el cambio
+    Usuario actualizar(Long id, Usuario datos, String password, Long idUsuarioActual);
 
-    void eliminar(Long id);
+    void eliminar(Long id, Long idUsuarioActual);
 }

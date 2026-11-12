@@ -14,6 +14,8 @@ public interface UsuarioJpaRepository extends JpaRepository<Usuario, Long> {
 
     boolean existsByRol(Rol rol);
 
+    long countByRolAndActivoTrue(Rol rol);
+
     boolean existsByEstudianteIdEstudiante(String idEstudiante);
 
     boolean existsByProfesorIdProfesor(String idProfesor);

@@ -153,7 +153,7 @@ public class ReporteServicesImpl implements ReporteServices {
         Materia materia = materiaServices.obtenerPorId(idMateria);
         String idNivel = grupo.getNivel().getIdNivel();
         if (!nivelMateriaRepository.existsByNivelIdNivelAndMateriaIdMateria(idNivel, idMateria)) {
-            throw new BusinessException("La materia " + idMateria + " no pertenece al nivel " + idNivel
+            throw new BusinessException("MATERIA_FUERA_DEL_NIVEL", "La materia " + idMateria + " no pertenece al nivel " + idNivel
                     + " del grupo " + idGrupo);
         }
 

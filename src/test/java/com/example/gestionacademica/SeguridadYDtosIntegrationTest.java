@@ -10,9 +10,17 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.everyItem;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.options;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -159,6 +167,143 @@ class SeguridadYDtosIntegrationTest {
         mockMvc.perform(conToken(post("/api/grupos").contentType(MediaType.APPLICATION_JSON)
                         .content("{\"idGrupo\":\"G9\",\"nombreGrupo\":\"G9\",\"idNivel\":\"NO-EXISTE\"}"), token))
                 .andExpect(status().isNotFound());
+    }
+
+    // ---------- Listados recortados por rol ----------
+
+    @Test
+    void profesorSoloRecibeSusMateriasYGrupos() throws Exception {
+        String token = login("profesor1", DEMO); // MAT001 en GRP001; no dicta en GRP002
+        mockMvc.perform(conToken(get("/api/notas"), token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(2))
+                .andExpect(jsonPath("$[*].idMateria", everyItem(is("MAT001"))));
+        mockMvc.perform(conToken(get("/api/movimiento-notas"), token))
+                .andExpect(jsonPath("$[*].idMateria", everyItem(is("MAT001"))));
+        mockMvc.perform(conToken(get("/api/asistencia"), token))
+                .andExpect(jsonPath("$.length()").value(1))
+                .andExpect(jsonPath("$[0].idGrupo").value("GRP001"));
+        mockMvc.perform(conToken(get("/api/inscripciones"), token))
+                .andExpect(jsonPath("$[*].idGrupo", everyItem(is("GRP001"))));
+        mockMvc.perform(conToken(get("/api/estudiantes"), token))
+                .andExpect(jsonPath("$[*].idEstudiante", containsInAnyOrder("EST001", "EST002")));
+    }
+
+    @Test
+    void gestorRecibeListadosCompletos() throws Exception {
+        String token = login("coordinador", DEMO);
+        mockMvc.perform(conToken(get("/api/notas"), token)).andExpect(jsonPath("$.length()").value(3));
+        mockMvc.perform(conToken(get("/api/asistencia"), token)).andExpect(jsonPath("$.length()").value(2));
+        mockMvc.perform(conToken(get("/api/estudiantes"), token))
+                .andExpect(jsonPath("$[*].idEstudiante", hasItem("EST003")));
+    }
+
+    // ---------- Formato de errores ----------
+
+    @Test
+    void erroresLlevanCodigoYDescripcionEnEspanol() throws Exception {
+        mockMvc.perform(get("/api/carreras"))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.error").value("No autenticado"))
+                .andExpect(jsonPath("$.codigo").value("NO_AUTENTICADO"));
+        mockMvc.perform(get("/api/carreras").header("Authorization", "Bearer basura"))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.codigo").value("TOKEN_INVALIDO"));
+        mockMvc.perform(post("/api/auth/login").contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"username\":\"est001\",\"password\":\"otra\"}"))
+                .andExpect(jsonPath("$.codigo").value("CREDENCIALES_INVALIDAS"));
+        mockMvc.perform(post("/api/auth/login").contentType(MediaType.APPLICATION_JSON).content("{}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.codigo").value("VALIDACION"))
+                .andExpect(jsonPath("$.errores.username").exists());
+        mockMvc.perform(post("/api/auth/login").contentType(MediaType.TEXT_PLAIN).content("x"))
+                .andExpect(status().isUnsupportedMediaType())
+                .andExpect(jsonPath("$.error").value("Tipo de contenido no soportado"));
+
+        String estudiante = login("est001", DEMO);
+        mockMvc.perform(conToken(get("/api/notas"), estudiante))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.error").value("Acceso denegado"))
+                .andExpect(jsonPath("$.codigo").value("SIN_PERMISO"));
+
+        String token = login("coordinador", DEMO);
+        mockMvc.perform(conToken(get("/api/no-existe"), token))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.error").value("No encontrado"))
+                .andExpect(jsonPath("$.codigo").value("RUTA_NO_ENCONTRADA"));
+        mockMvc.perform(conToken(get("/api/estudiantes/NO-EXISTE"), token))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.codigo").value("ESTUDIANTE_NO_ENCONTRADO"));
+        mockMvc.perform(conToken(get("/api/notas/abc"), token))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.codigo").value("PARAMETRO_INVALIDO"));
+        mockMvc.perform(conToken(delete("/api/notas"), token))
+                .andExpect(status().isMethodNotAllowed())
+                .andExpect(jsonPath("$.error").value("Método no permitido"));
+    }
+
+    @Test
+    void preflightCorsNoExigeToken() throws Exception {
+        mockMvc.perform(options("/api/notas")
+                        .header("Origin", "http://localhost:5173")
+                        .header("Access-Control-Request-Method", "GET")
+                        .header("Access-Control-Request-Headers", "authorization,content-type"))
+                .andExpect(status().isOk())
+                .andExpect(header().string("Access-Control-Allow-Origin", "http://localhost:5173"));
+        mockMvc.perform(options("/api/notas")
+                        .header("Origin", "http://evil.example")
+                        .header("Access-Control-Request-Method", "GET"))
+                .andExpect(status().isForbidden());
+    }
+
+    // ---------- Reglas de usuarios ----------
+
+    @Test
+    void administrativoNoSeBorraNiDejaElSistemaSinAdministrativos() throws Exception {
+        String admin = login("admin", "Admin123*");
+        String idAdmin = JsonPath.read(mockMvc.perform(conToken(get("/api/auth/me"), admin))
+                .andReturn().getResponse().getContentAsString(), "$.idUsuario").toString();
+
+        mockMvc.perform(conToken(delete("/api/usuarios/" + idAdmin), admin))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.codigo").value("CUENTA_PROPIA"));
+        mockMvc.perform(conToken(put("/api/usuarios/" + idAdmin).contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"username\":\"admin\",\"rol\":\"ADMINISTRATIVO\",\"activo\":false}"), admin))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.codigo").value("CUENTA_PROPIA"));
+
+        // Vínculos: estudiante inexistente (404) y estudiante que ya tiene cuenta (409)
+        mockMvc.perform(conToken(post("/api/usuarios").contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"username\":\"fantasma\",\"password\":\"Clave1234\",\"rol\":\"ESTUDIANTE\","
+                                + "\"activo\":true,\"idEstudiante\":\"NO-EXISTE\"}"), admin))
+                .andExpect(status().isNotFound());
+        mockMvc.perform(conToken(post("/api/usuarios").contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"username\":\"otroest001\",\"password\":\"Clave1234\",\"rol\":\"ESTUDIANTE\","
+                                + "\"activo\":true,\"idEstudiante\":\"EST001\"}"), admin))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.codigo").value("VINCULO_DUPLICADO"));
+
+        // admin2 inicia sesión y luego es desactivado: su token sigue vigente, pero ya no puede
+        // desactivar al único ADMINISTRATIVO activo que queda, y no puede volver a entrar
+        String body = mockMvc.perform(conToken(post("/api/usuarios").contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"username\":\"admin2\",\"password\":\"Clave1234\",\"rol\":\"ADMINISTRATIVO\",\"activo\":true}"), admin))
+                .andExpect(status().isCreated())
+                .andReturn().getResponse().getContentAsString();
+        String idAdmin2 = JsonPath.read(body, "$.idUsuario").toString();
+        String admin2 = login("admin2", "Clave1234");
+        mockMvc.perform(conToken(put("/api/usuarios/" + idAdmin2).contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"username\":\"admin2\",\"rol\":\"ADMINISTRATIVO\",\"activo\":false}"), admin))
+                .andExpect(status().isOk());
+        mockMvc.perform(conToken(put("/api/usuarios/" + idAdmin).contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"username\":\"admin\",\"rol\":\"ADMINISTRATIVO\",\"activo\":false}"), admin2))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.codigo").value("ULTIMO_ADMINISTRATIVO"));
+
+        mockMvc.perform(post("/api/auth/login").contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"username\":\"admin2\",\"password\":\"Clave1234\"}"))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.codigo").value("CUENTA_DESACTIVADA"))
+                .andExpect(jsonPath("$.message").value("Tu cuenta está desactivada"));
     }
 
     private String login(String username, String password) throws Exception {

@@ -45,7 +45,7 @@ public class AsignacionMateriaProfesorServicesImpl implements AsignacionMateriaP
     @Override
     public AsignacionMateriaProfesor obtenerPorId(Long id) {
         return asignacionMateriaProfesorRepository.findById(id)
-                .orElseThrow(() -> new AsignacionMateriaProfesorNotFoundException("AsignacionMateriaProfesor no encontrado con id: " + id));
+                .orElseThrow(() -> new AsignacionMateriaProfesorNotFoundException("Asignación no encontrada con id: " + id));
     }
 
     @Override
@@ -81,7 +81,7 @@ public class AsignacionMateriaProfesorServicesImpl implements AsignacionMateriaP
     @Override
     public void eliminar(Long id) {
         if (!asignacionMateriaProfesorRepository.existsById(id)) {
-            throw new AsignacionMateriaProfesorNotFoundException("AsignacionMateriaProfesor no encontrado con id: " + id);
+            throw new AsignacionMateriaProfesorNotFoundException("Asignación no encontrada con id: " + id);
         }
         asignacionMateriaProfesorRepository.deleteById(id);
     }
@@ -95,7 +95,7 @@ public class AsignacionMateriaProfesorServicesImpl implements AsignacionMateriaP
         Profesor profesor = profesorRepository.findById(idProfesor)
                 .orElseThrow(() -> new ProfesorNotFoundException("Profesor no encontrado con id: " + idProfesor));
         if (!profesor.getActivo()) {
-            throw new BusinessException("El profesor " + idProfesor + " no está activo y no puede recibir asignaciones");
+            throw new BusinessException("PROFESOR_INACTIVO", "El profesor " + idProfesor + " no está activo y no puede recibir asignaciones");
         }
 
         // 2. La materia debe pertenecer al plan del nivel del grupo
@@ -103,13 +103,13 @@ public class AsignacionMateriaProfesorServicesImpl implements AsignacionMateriaP
                 .orElseThrow(() -> new GrupoNotFoundException("Grupo no encontrado con id: " + idGrupo));
         String idNivel = grupo.getNivel().getIdNivel();
         if (!nivelMateriaRepository.existsByNivelIdNivelAndMateriaIdMateria(idNivel, idMateria)) {
-            throw new BusinessException("La materia " + idMateria + " no pertenece al nivel " + idNivel
+            throw new BusinessException("MATERIA_FUERA_DEL_NIVEL", "La materia " + idMateria + " no pertenece al nivel " + idNivel
                     + " del grupo " + idGrupo);
         }
 
         // 3. Cada materia tiene un solo profesor por grupo
         if (validarDuplicado && asignacionMateriaProfesorRepository.existsByGrupoIdGrupoAndMateriaIdMateria(idGrupo, idMateria)) {
-            throw new BusinessException("La materia " + idMateria + " ya tiene un profesor asignado en el grupo " + idGrupo);
+            throw new BusinessException("MATERIA_YA_ASIGNADA", "La materia " + idMateria + " ya tiene un profesor asignado en el grupo " + idGrupo);
         }
     }
 }
